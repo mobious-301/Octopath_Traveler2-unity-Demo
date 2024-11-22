@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/Lit"
+Shader "Custom/Lit"
 {
     Properties
     {
@@ -165,8 +165,10 @@ Shader "Universal Render Pipeline/Lit"
             #pragma instancing_options renderinglayer
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
+            // #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "./LitInput.hlsl"
+            // #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
+            #include "./LitForwardPass.hlsl"
             ENDHLSL
         }
 
