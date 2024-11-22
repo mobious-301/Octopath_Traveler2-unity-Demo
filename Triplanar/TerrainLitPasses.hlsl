@@ -182,6 +182,8 @@ void SplatmapMix(float4 uvMainAndLM, float4 uvSplat01, float4 uvSplat23, inout h
     mixedDiffuse += diffAlbedo[1] * half4(_DiffuseRemapScale1.rgb * splatControl.ggg, 1.0h);
     mixedDiffuse += diffAlbedo[2] * half4(_DiffuseRemapScale2.rgb * splatControl.bbb, 1.0h);
     mixedDiffuse += diffAlbedo[3] * half4(_DiffuseRemapScale3.rgb * splatControl.aaa, 1.0h);
+    mixedDiffuse*=5;
+
 
     NormalMapMix(uvSplat01, uvSplat23, splatControl, mixedNormal);
 }
@@ -315,6 +317,22 @@ void ComputeMasks(out half4 masks[4], half4 hasMask, Varyings IN)
     masks[3] *= _MaskMapRemapScale3.rgba;
     masks[3] += _MaskMapRemapOffset3.rgba;
 }
+// plus
+struct TriUV {
+    float2 xUV, yUV, zUV;
+};
+
+TriUV GetTriUV(float3 worldpos) {
+    TriUV triUV;
+    // triUV.xUV = worldpos.zy%1;
+    // triUV.yUV = worldpos.zx%1;
+    // triUV.zUV = worldpos.xy%1;
+    
+    triUV.xUV = (worldpos.zx*_Splat0_ST.xy+_Splat0_ST.zw)%1;
+    triUV.yUV = (worldpos.zy*_Splat1_ST.xy+_Splat1_ST.zw)%1;
+    triUV.zUV = (worldpos.xy*_Splat2_ST.xy+_Splat2_ST.zw)%1;
+    return triUV;
+}
 
 // Used in Standard Terrain shader
 #ifdef TERRAIN_GBUFFER
@@ -329,6 +347,11 @@ void SplatmapFragment(
     )
 #endif
 {
+    //##plus
+    IN.uvSplat01.xy = GetTriUV(IN.positionWS).xUV;
+    IN.uvSplat01.zw = GetTriUV(IN.positionWS).yUV;
+    IN.uvSplat23.xy = GetTriUV(IN.positionWS).zUV;
+    IN.uvSplat23.zw = GetTriUV(IN.positionWS).yUV;
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
 #ifdef _ALPHATEST_ON
     ClipHoles(IN.uvMainAndLM.xy);
@@ -349,6 +372,8 @@ void SplatmapFragment(
 
     float2 splatUV = (IN.uvMainAndLM.xy * (_Control_TexelSize.zw - 1.0f) + 0.5f) * _Control_TexelSize.xy;
     half4 splatControl = SAMPLE_TEXTURE2D(_Control, sampler_Control, splatUV);
+
+    splatControl.xyz = GetTriWeights(IN.normal);//####法线 覆盖 contrl
 
     half alpha = dot(splatControl, 1.0h);
 #ifdef _TERRAIN_BLEND_HEIGHT
@@ -421,7 +446,7 @@ void SplatmapFragment(
     return BRDFDataToGbuffer(brdfData, inputData, smoothness, color.rgb, occlusion);
 
 #else
-
+occlusion=1;//正常输出
     half4 color = UniversalFragmentPBR(inputData, albedo, metallic, /* specular */ half3(0.0h, 0.0h, 0.0h), smoothness, occlusion, /* emission */ half3(0, 0, 0), alpha);
 
     SplatmapFinalColor(color, inputData.fogCoord);
