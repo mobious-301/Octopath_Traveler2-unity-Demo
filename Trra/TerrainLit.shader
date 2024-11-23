@@ -1,41 +1,70 @@
-Shader "Universal Render Pipeline/Terrain/Lit"
+Shader "Custom/Terrain/TrraLit"
 {
     Properties
     {
-        [HideInInspector] [ToggleUI] _EnableHeightBlend("EnableHeightBlend", Float) = 0.0
+
+        _BlendOffset("BlendOffset",Range(0,0.5)) = 0.25
+        _BlendExponent ("Blend Exponent", Range(1, 8)) = 2
+
+        //Plus
+        _DiffuseRemapScale0("Diffuse Remap Scale 0", color) = (1, 1, 1, 1)
+        _DiffuseRemapScale1("Diffuse Remap Scale 1", color) = (1, 1, 1, 1)
+        _DiffuseRemapScale2("Diffuse Remap Scale 2", color) = (1, 1, 1, 1)
+        _DiffuseRemapScale3("Diffuse Remap Scale 3", color) = (1, 1, 1, 1)
+
+        // _NormalScale0
+        _NormalScale0 ("_NormalScale0",Range(-1,1)) = 0
+        _NormalScale1 ("_NormalScale0",Range(-1,1)) = 0
+        _NormalScale2 ("_NormalScale0",Range(-1,1)) = 0
+        _NormalScale3 ("_NormalScale0",Range(-1,1)) = 0
+
+
+
+
+         [ToggleUI] _EnableHeightBlend("EnableHeightBlend", Float) = 0.0
         _HeightTransition("Height Transition", Range(0, 1.0)) = 0.0
         // Layer count is passed down to guide height-blend enable/disable, due
         // to the fact that heigh-based blend will be broken with multipass.
-        [HideInInspector] [PerRendererData] _NumLayersCount ("Total Layer Count", Float) = 1.0
+         [PerRendererData] _NumLayersCount ("Total Layer Count", Float) = 1.0
 
         // set by terrain engine
-        [HideInInspector] _Control("Control (RGBA)", 2D) = "red" {}
-        [HideInInspector] _Splat3("Layer 3 (A)", 2D) = "grey" {}
-        [HideInInspector] _Splat2("Layer 2 (B)", 2D) = "grey" {}
-        [HideInInspector] _Splat1("Layer 1 (G)", 2D) = "grey" {}
-        [HideInInspector] _Splat0("Layer 0 (R)", 2D) = "grey" {}
-        [HideInInspector] _Normal3("Normal 3 (A)", 2D) = "bump" {}
-        [HideInInspector] _Normal2("Normal 2 (B)", 2D) = "bump" {}
-        [HideInInspector] _Normal1("Normal 1 (G)", 2D) = "bump" {}
-        [HideInInspector] _Normal0("Normal 0 (R)", 2D) = "bump" {}
-        [HideInInspector] _Mask3("Mask 3 (A)", 2D) = "grey" {}
-        [HideInInspector] _Mask2("Mask 2 (B)", 2D) = "grey" {}
-        [HideInInspector] _Mask1("Mask 1 (G)", 2D) = "grey" {}
-        [HideInInspector] _Mask0("Mask 0 (R)", 2D) = "grey" {}
-        [HideInInspector][Gamma] _Metallic0("Metallic 0", Range(0.0, 1.0)) = 0.0
-        [HideInInspector][Gamma] _Metallic1("Metallic 1", Range(0.0, 1.0)) = 0.0
-        [HideInInspector][Gamma] _Metallic2("Metallic 2", Range(0.0, 1.0)) = 0.0
-        [HideInInspector][Gamma] _Metallic3("Metallic 3", Range(0.0, 1.0)) = 0.0
-        [HideInInspector] _Smoothness0("Smoothness 0", Range(0.0, 1.0)) = 0.5
-        [HideInInspector] _Smoothness1("Smoothness 1", Range(0.0, 1.0)) = 0.5
-        [HideInInspector] _Smoothness2("Smoothness 2", Range(0.0, 1.0)) = 0.5
-        [HideInInspector] _Smoothness3("Smoothness 3", Range(0.0, 1.0)) = 0.5
+        //  _Control("Control (RGBA)", 2D) = "red" {}
+        //  _Splat3("Layer 3 (A)", 2D) = "grey" {}
+        //  _Splat2("Layer 2 (B)", 2D) = "grey" {}
+        //  _Splat1("Layer 1 (G)", 2D) = "grey" {}
+        //  _Splat0("Layer 0 (R)", 2D) = "grey" {}
+        _Control("Control (RGBA)", 2D) = "red" {}
+        //改
+        _Splat3("Layer 3 (A)", 2D) = "white" {}
+        _Splat2("Layer 2 (B)", 2D) = "white" {}
+        _Splat1("Layer 1 (G)", 2D) = "white" {}
+        _Splat0("Layer 0 (R)", 2D) = "white" {}
+
+
+
+        [NoScaleOffset]_Normal3("Normal 3 (A)", 2D) = "bump" {}
+         [NoScaleOffset]_Normal2("Normal 2 (B)", 2D) = "bump" {}
+         [NoScaleOffset]_Normal1("Normal 1 (G)", 2D) = "bump" {}
+         [NoScaleOffset]_Normal0("Normal 0 (R)", 2D) = "bump" {}
+
+         _Mask3("Mask 3 (A)", 2D) = "grey" {}
+         _Mask2("Mask 2 (B)", 2D) = "grey" {}
+         _Mask1("Mask 1 (G)", 2D) = "grey" {}
+         _Mask0("Mask 0 (R)", 2D) = "grey" {}
+        [Gamma] _Metallic0("Metallic 0", Range(0.0, 1.0)) = 0.0
+        [Gamma] _Metallic1("Metallic 1", Range(0.0, 1.0)) = 0.0
+        [Gamma] _Metallic2("Metallic 2", Range(0.0, 1.0)) = 0.0
+        [Gamma] _Metallic3("Metallic 3", Range(0.0, 1.0)) = 0.0
+         _Smoothness0("Smoothness 0", Range(0.0, 1.0)) = 0.5
+         _Smoothness1("Smoothness 1", Range(0.0, 1.0)) = 0.5
+         _Smoothness2("Smoothness 2", Range(0.0, 1.0)) = 0.5
+         _Smoothness3("Smoothness 3", Range(0.0, 1.0)) = 0.5
 
         // used in fallback on old cards & base map
-        [HideInInspector] _MainTex("BaseMap (RGB)", 2D) = "grey" {}
-        [HideInInspector] _BaseColor("Main Color", Color) = (1,1,1,1)
+         _MainTex("BaseMap (RGB)", 2D) = "grey" {}
+         _BaseColor("Main Color", Color) = (1,1,1,1)
 
-        [HideInInspector] _TerrainHolesTexture("Holes Map (RGB)", 2D) = "white" {}
+         _TerrainHolesTexture("Holes Map (RGB)", 2D) = "white" {}
 
         [ToggleUI] _EnableInstancedPerPixelNormal("Enable Instanced per-pixel normal", Float) = 1.0
     }
@@ -96,9 +125,24 @@ Shader "Universal Render Pipeline/Terrain/Lit"
             #pragma shader_feature_local_fragment _MASKMAP
             // Sample normal in pixel shader when doing instancing
             #pragma shader_feature_local _TERRAIN_INSTANCED_PERPIXEL_NORMAL
+            // #define DYNAMICLIGHTMAP_ON  //开启GI
+            // #define LIGHTMAP_ON//不能开
+            #define _NORMALMAP 
+            #define _MASKMAP
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
+            // #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
+            float _BlendOffset;
+            half _BlendExponent;
+
+            float3 GetTriWeights(float3 normal) {
+                float3 weights = abs(normal);
+                weights = saturate(weights - _BlendOffset);
+                weights = pow(weights, _BlendExponent);
+                weights = weights / (weights.x + weights.y + weights.z);
+                return weights.yxz;
+            }
+            #include "./TerrainLitPasses.hlsl"
             ENDHLSL
         }
 
@@ -281,7 +325,9 @@ Shader "Universal Render Pipeline/Terrain/Lit"
     Dependency "BaseMapShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)"
     Dependency "BaseMapGenShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Basemap Gen)"
 
-    CustomEditor "UnityEditor.Rendering.Universal.TerrainLitShaderGUI"
+    // CustomEditor "UnityEditor.Rendering.Universal.TerrainLitShaderGUI"
+    CustomEditor "UnityEditor.Rendering.Universal.ShaderGUI.CustomTerrainShaderEditor"
+    
 
     Fallback "Hidden/Universal Render Pipeline/FallbackError"
 }
